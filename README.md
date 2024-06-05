@@ -10,6 +10,8 @@ pnpm run dev
 
 To inspect machines open the stately sky inspector url once the server starts.
 
+Game machine online scheme to play with: https://stately.ai/registry/editor/2e6c9cad-81e6-46f4-9f68-e4d7ea7b0c14?machineId=1a95a9d1-3f97-4fd2-8eea-d9cffed18fd2
+
 ## Screenshots
 ![photo_1_2024-06-05_18-52-15](https://github.com/pipeline-crawler/xs-ttt/assets/68857755/e3003a02-44ee-4dcb-b468-0ac1bad26d14)
 
