@@ -8,6 +8,8 @@ pnpm i
 pnpm run dev
 ```
 
+To inspect machines open the stately sky inspector url once the server starts.
+
 ## Screenshots
 ![photo_1_2024-06-05_18-52-15](https://github.com/pipeline-crawler/xs-ttt/assets/68857755/e3003a02-44ee-4dcb-b468-0ac1bad26d14)
 
