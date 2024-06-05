@@ -14,6 +14,7 @@ import { type ChangeEvent, useEffect, useState } from "react";
 
 export function GameLobbyCard() {
   const [username, setUsername] = useState<string>("");
+  const [gameId, setGameId] = useState<string>("");
   const router = useRouter();
 
   useEffect(() => {
@@ -30,8 +31,16 @@ export function GameLobbyCard() {
     localStorage.setItem("username", newUsername); // Update local storage
   };
 
+  const handleGameIdChange = (e: ChangeEvent<HTMLInputElement>) => {
+    setGameId(e.target.value);
+  };
+
   const handleCreateNewGame = () => {
-    const gameId = nanoid();
+    const newGameId = nanoid();
+    router.push(`/game?userName=${username}&gameId=${newGameId}`);
+  };
+
+  const handleJoinExistingGame = () => {
     router.push(`/game?userName=${username}&gameId=${gameId}`);
   };
 
@@ -54,8 +63,15 @@ export function GameLobbyCard() {
         </CardContent>
       </Card>
       <Card className="space-y-4 p-6">
-        <Input type="text" placeholder="game id" />
-        <Button className="w-full">Join existing game</Button>
+        <Input
+          type="text"
+          placeholder="game id"
+          value={gameId}
+          onChange={handleGameIdChange}
+        />
+        <Button className="w-full" onClick={handleJoinExistingGame}>
+          Join existing game
+        </Button>
         <div className="relative">
           <div className="absolute inset-0 flex items-center">
             <span className="w-full border-t" />

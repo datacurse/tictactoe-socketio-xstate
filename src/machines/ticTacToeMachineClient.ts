@@ -30,7 +30,7 @@ interface TicTacToeContext {
 }
 
 export const ticTacToeMachine =
-  /** @xstate-layout N4IgpgJg5mDOIC5QBUCWBjZBDTB7MABALI4AWqAdmAMQCusYATgHTq4VXoAuA2gAwBdRKAAOuWKi6p2wkAA9EAWgAsANgDszdQFY+e5QE4AzKoBMfbQA4ANCACeS08s06+lt6oNqAjJdMGAXwDbNEwcZHxiMkoaeiZmCFRYNg4wbn4hJBAxCSkZLIUERVN1b2YLK28jbXUDHXV1WwcipxddWoNvGst1Q20gkIxsPEISdHIqOgYWROT2Tl5vTNFxSWkKWULFIwNTZlVtTx0jHUtd5WUmpWU9ko0zo2VdDT51AZBQ4YjR6KpmAHUsGsKFACAAxXCMAgABQANlg7ExYNQAEZpXAAWzAzBE8MRjAyshya3yoC2TyMzFMuj4akMqncbm0VwQTkpej4VXUqlUFI0b2CHyG4UiYwm2MBwNBEKhcIRSNR6KxOLxTB4SyJqzyGwK10sqiphjO-mUfCMJ28LOqmgMtq82lM3lUtP870+Ip+4xiAKBUhB4MhMNVjGRhKyxO1myUvj4VJpB0eGk82iMLKdBnKTgMPWcOjqxjdwpGUS9fwAggB3X2UUFy-HEXAANxoGKbYDDK1y6yjRTUzBuzgZ2YMTIMqhZpj8zBp3j4BysJiMplUhbCxbF3sr1f9daYDeb1A72S13d1rJ20903idvP1Y4saYa-bt19qnO8Y-6gvd69+2K3UpBvKUJEG2h4auGJ6kvIiCOhmXScmafD+GahiXPYsGqGUZy2ihBiHEYqGrl8op-swADiWBYgQADyzaMNQuIIswWBQECFBHhGp5kog17KFolhOo8k7mLO44YUUlKGLalhqGcFjqHwtpBIKFC4BAcCyD+3wluKmpdtBWwpvxWbGl4ZoWiyijeP407crUvjXuYuzER6unepKfrSoGu4hvpJI6jxvbePxlhGCFDpnB+pqWhJN7MCc0kmOYzpdMorm-qW-5VoBvn7mA-mRmetk8q0hwNKYRg9N4jRxTyCW9LayVzpy2jpd+RY6RufyUdRdFMIV3EwQgdKZjSFzKCF6hOMyEl1P20n6gONm+CuHVrl1ZG9YQ-UsHl-zQVxhmINoNlaI16g7DZpRnGmslaDSFS1IcyhGBlm1ZRRVE7fRzAACKMFgFaDcdCCnXsyHjRcU1OFatLMLsuhjk6JpuCpARAA */
+  /** @xstate-layout N4IgpgJg5mDOIC5QBUCWBjZBDTB7MABALI4AWqAdmAMQCusYATgHTq4VXoAuA2gAwBdRKAAOuWKi6p2wkAA9EAWgBMAFgCszAGwBOZQA5lAZh17la9QBoQATyUBGffeYB2fVpefVRowcf6AXwDrNEwcZHxiMkowZgBBAHcsSUooAgAFABssGyZiXAA3GgBbQrB+ISQQMQkpGSqFBEVVLWZVNRctfR1uvn11HS1rOwQDZWZ1Pj57Pi11dX0jLV8tIJCMbDxCEnRyKniklIo0rJy8ojLqCtkalPrQRuU3VyWPdRcdI1VvnWHEe10zD4ah6jj46kcAOUaxAoU2EW20X2iWSUmOGWyuUY+SKV3slVE4juFFkj3sOmY9kmMyMwJ0fC+OlUf1GWmc3VMynpOnUywZqiCwRAFFwEDgsjh4UiOz2YBuRLqJIaSmUWj4zCWLl5Ji8fFU+hcLMURmcWhBi30epcU30qhcMMlWyiuxizAA6qjUgQAGK4bGnLHwKq3RWklX2caa7U6XWqX62f5aVpGFxxz5m2bTdQCoWOhHO2UHT3ogPnMry2rSJUPRBc7Rmu28zzGA32Q0JhAA5Op0xLZSZqk59ZhJ0y10AcSwxUIAHkiowK8Swwh9apmHpvoYXP3dHqjCz5totcDJuDTIt7bmNlLES79pPpwQ50xmKXsW77tUFVXl+ovuvLTmPoejccEWXsdp12PHwnCTGNVivEd8zHe8p1nedmAAEUYLAEkXUNlQQP9xg3fUnh3elmQ7ZQBmYEF6T1GimxzIIgA */
   setup({
     types: {
       input: {} as {
@@ -46,42 +46,6 @@ export const ticTacToeMachine =
     },
 
     actions: {
-      addUser: assign({
-        onlineUsers: ({ context, event }) => {
-          assertEvent(event, "user.connect");
-          return [...context.onlineUsers, event.userName];
-        },
-      }),
-      removeUser: assign({
-        onlineUsers: ({ context, event }) => {
-          assertEvent(event, "user.disconnect");
-          return context.onlineUsers.filter(
-            (userName) => userName !== event.userName,
-          );
-        },
-      }),
-      notifyParentToKill: sendParent(({ context }) => ({
-        type: "game.kill",
-        gameId: context.gameId!,
-      })),
-      joinGame: assign({
-        players: ({ context, event }) => {
-          assertEvent(event, "become.player");
-          const updatedPlayers = [...context.players];
-          const undefinedPlayers = updatedPlayers.filter(
-            (player) => player.playerName === undefined,
-          );
-          if (undefinedPlayers.length === 2) {
-            // Both playerIds are undefined, assign the playerId to a random player
-            const randomIndex = Math.floor(Math.random() * 2);
-            updatedPlayers[randomIndex]!.playerName = event.playerName; // Assertion added
-          } else if (undefinedPlayers.length === 1) {
-            // Only one playerId is undefined, assign the playerId to that player
-            undefinedPlayers[0]!.playerName = event.playerName; // Assertion added
-          }
-          return updatedPlayers;
-        },
-      }),
       updateBoard: assign({
         board: ({ context, event }) => {
           assertEvent(event, "move");
@@ -115,35 +79,12 @@ export const ticTacToeMachine =
           return updatedPlayers;
         },
       }),
-      resetGame: assign({
-        board: Array(9).fill(null),
-        moves: 0,
-        movingPlayer: "x",
-        winner: undefined,
-        lastMoveTime: undefined, // Reset last move time
-        players: ({ context }) =>
-          context.players.map((player) => ({
-            ...player,
-            secondsLeft: 300,
-          })), // Reset players' time without resetting players
-      }),
       setWinner: assign({
         winner: ({ context }) => (context.movingPlayer === "x" ? "o" : "x"),
       }),
     },
 
     guards: {
-      "all players joined": ({ context }) => {
-        const { players } = context;
-        return players.every((player) => player.playerName !== undefined);
-      },
-      "user isn't player": ({ context, event }) => {
-        assertEvent(event, "become.player");
-        const { players } = context;
-        return !players.some(
-          (player) => player.playerName === event.playerName,
-        );
-      },
       "check win": ({ context }) => {
         const { board } = context;
         const winningLines = [
@@ -186,15 +127,9 @@ export const ticTacToeMachine =
         if (!player) return false;
         return player.playerSide === context.movingPlayer;
       },
-      "no users connected": ({ context }) => {
-        return context.onlineUsers.length === 0;
+      "2 initial moves done": ({ context }) => {
+        return context.moves === 2;
       },
-      "last user is leaving": ({ context }) => {
-        return context.onlineUsers.length === 1;
-      },
-      // "2 initial moves done": ({ context }) => {
-      //   return context.moves === 2;
-      // },
     },
   }).createMachine({
     id: "TicTacToe Machine",
@@ -227,45 +162,10 @@ export const ticTacToeMachine =
       "user.connect": {
         actions: "addUser",
       },
-      "user.disconnect": [
-        {
-          actions: {
-            type: "notifyParentToKill",
-          },
-          guard: {
-            type: "no users connected",
-          },
-        },
-        {
-          actions: {
-            type: "removeUser",
-          },
-        },
-      ],
     },
 
     states: {
-      "Waiting For Players": {
-        on: {
-          "become.player": [
-            {
-              actions: {
-                type: "joinGame",
-              },
-              guard: {
-                type: "user isn't player",
-              },
-            },
-            {},
-          ],
-        },
-        always: {
-          target: "Awaiting Player Move",
-          guard: {
-            type: "all players joined",
-          },
-        },
-      },
+      "Waiting For Players": {},
 
       "Awaiting Player Move": {
         always: [
@@ -282,6 +182,7 @@ export const ticTacToeMachine =
 
       "Game Over": {
         initial: "Player Won",
+
         states: {
           "Player Won": {
             tags: "winner",
@@ -289,12 +190,6 @@ export const ticTacToeMachine =
           },
           Draw: {
             tags: "draw",
-          },
-        },
-        on: {
-          "play.again": {
-            target: "Awaiting Player Move",
-            actions: "resetGame",
           },
         },
       },

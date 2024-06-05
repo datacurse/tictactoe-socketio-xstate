@@ -1,7 +1,10 @@
 "use client";
 import { socket } from "@/clientSocket";
+import { UserInfo } from "@/components/PlayerInfo";
 import { Tile } from "@/components/Tile";
+import { Card } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
+import { formatTime } from "@/lib/utils";
 import Timer from "easytimer.js";
 import { useSearchParams } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
@@ -56,17 +59,9 @@ function getEnemy(
   return context.players.find((player) => player.playerName !== userName);
 }
 
-function formatTime(seconds: number): string {
-  const minutes = Math.floor(seconds / 60);
-  const remainingSeconds = Math.round(seconds % 60);
-  return `${String(minutes).padStart(2, "0")}:${String(
-    remainingSeconds,
-  ).padStart(2, "0")}`;
-}
-
 export default function HomePage() {
   const searchParams = useSearchParams();
-  const roomId = searchParams.get("roomId") ?? "1";
+  const gameId = searchParams.get("gameId") ?? "1";
   const userName = searchParams.get("userName") ?? "username";
 
   const [state, setState] = useState<TicTacToeState | undefined>(undefined);
@@ -78,7 +73,7 @@ export default function HomePage() {
   useEffect(() => {
     socket.on("connect", () => {
       console.log("Connected to server");
-      socket.emit("joinGame", roomId, userName);
+      socket.emit("joinGame", gameId, userName);
     });
 
     socket.on("updateState", (newState: TicTacToeState) => {
@@ -91,7 +86,7 @@ export default function HomePage() {
       setMyTime(me.secondsLeft);
       setEnemyTime(enemy ? enemy.secondsLeft : 300);
 
-      if (newState.context.moves >= 2) {
+      if (newState.context.moves >= 1) {
         if (newState.context.movingPlayer === me.playerSide) {
           myTimer.current.start({
             countdown: true,
@@ -117,7 +112,7 @@ export default function HomePage() {
       socket.off("connect");
       socket.off("updateState");
     };
-  }, [roomId, userName]);
+  }, [gameId, userName]);
 
   useEffect(() => {
     myTimer.current.addEventListener("secondsUpdated", () => {
@@ -155,47 +150,52 @@ export default function HomePage() {
     state.context.onlineUsers.includes(playerName);
 
   return (
-    <div className="game relative p-4">
-      <div>
-        <div>Turn: {state.context.movingPlayer}</div>
-        <div className="flex items-center space-x-2">
-          <div
-            className={cn("min-h-4 min-w-4 rounded-full", {
-              // biome-ignore lint/style/noNonNullAssertion: <explanation>
-              "bg-green-500": isOnline(me.playerName!),
-              // biome-ignore lint/style/noNonNullAssertion: <explanation>
-              "bg-red-500": !isOnline(me.playerName!),
-            })}
-          />
-          <div>Me: {JSON.stringify(me)}</div>
-        </div>
-        <div className="flex items-center space-x-2">
-          <div
-            className={cn("min-h-4 min-w-4 rounded-full", {
-              // biome-ignore lint/style/noNonNullAssertion: <explanation>
-              "bg-green-500": enemy && isOnline(enemy.playerName!),
-              // biome-ignore lint/style/noNonNullAssertion: <explanation>
-              "bg-red-500": enemy && !isOnline(enemy.playerName!),
-            })}
-          />
-          <div>
-            Enemy:{" "}
-            {enemy ? JSON.stringify(enemy) : "waiting for enemy to join..."}
-          </div>
-        </div>
-        <div className="grid w-fit grid-cols-3 gap-1 bg-gray-300 p-4">
-          {range(0, 9).map((index) => (
-            <Tile
-              index={index}
-              onClick={() => handlePlayMove(index)}
-              key={index}
-              player={state.context.board[index] ?? null}
+    <div className="flex h-screen items-center justify-center">
+      <Card>
+        <div className="flex w-[440px] flex-col items-center">
+          {enemy && (
+            <UserInfo
+              username={enemy.playerName ?? ""}
+              wins={10}
+              playerSide={enemy.playerSide}
+              isMyTurn={state.context.movingPlayer === enemy.playerSide}
+              isConnected={isOnline(enemy ? enemy.playerName ?? "" : "")}
+              timeLeft={enemyTime}
             />
-          ))}
+          )}
+          {/* <div className="grid w-fit grid-cols-3 gap-1 bg-black p-1">
+            {range(0, 9).map((index) => (
+              <Tile
+                index={index}
+                onClick={() => handlePlayMove(index)}
+                key={index}
+                player={state.context.board[index] ?? null}
+              />
+            ))}
+          </div> */}
+          <div
+            className="grid h-full w-fit grid-cols-3 gap-4"
+            style={{ gridTemplateRows: "repeat(3, minmax(0, 1fr))" }}
+          >
+            {range(0, 9).map((index) => (
+              <Tile
+                index={index}
+                onClick={() => handlePlayMove(index)}
+                key={index}
+                player={state.context.board[index] ?? null}
+              />
+            ))}
+          </div>
+          <UserInfo
+            username={me.playerName ?? ""}
+            wins={10}
+            playerSide={me.playerSide}
+            isMyTurn={state.context.movingPlayer === me.playerSide}
+            isConnected={isOnline(me.playerName || "")}
+            timeLeft={myTime}
+          />
         </div>
-        <div>My Time: {formatTime(myTime)}</div>
-        <div>Enemy Time: {formatTime(enemyTime)}</div>
-      </div>
+      </Card>
       {typeof state.value === "object" && "Game Over" in state.value && (
         <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
           <div className="rounded bg-white p-6 text-center shadow-lg">
