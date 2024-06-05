@@ -2,6 +2,7 @@
 import { socket } from "@/clientSocket";
 import { UserInfo } from "@/components/PlayerInfo";
 import { Tile } from "@/components/Tile";
+import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
 import { formatTime } from "@/lib/utils";
@@ -35,6 +36,7 @@ interface TicTacToeContext {
 }
 
 type TicTacToeStateValue =
+  | "Waiting For Players"
   | "Awaiting Player Move"
   | { "Game Over": "Player Won" }
   | { "Game Over": "Draw" };
@@ -141,6 +143,12 @@ export default function HomePage() {
     setEnemyTime(300);
   }
 
+  function handleCopyGameId() {
+    navigator.clipboard.writeText(gameId).then(() => {
+      console.log("Game ID copied to clipboard:", gameId);
+    });
+  }
+
   if (!state) return <div>Loading...</div>;
 
   const me = getMe(state.context, userName);
@@ -152,7 +160,7 @@ export default function HomePage() {
   return (
     <div className="flex h-screen items-center justify-center">
       <Card>
-        <div className="flex w-[440px] flex-col items-center">
+        <div className="flex w-[352px] flex-col items-center">
           {enemy && (
             <UserInfo
               username={enemy.playerName ?? ""}
@@ -163,16 +171,6 @@ export default function HomePage() {
               timeLeft={enemyTime}
             />
           )}
-          {/* <div className="grid w-fit grid-cols-3 gap-1 bg-black p-1">
-            {range(0, 9).map((index) => (
-              <Tile
-                index={index}
-                onClick={() => handlePlayMove(index)}
-                key={index}
-                player={state.context.board[index] ?? null}
-              />
-            ))}
-          </div> */}
           <div
             className="grid h-full w-fit grid-cols-3 gap-4"
             style={{ gridTemplateRows: "repeat(3, minmax(0, 1fr))" }}
@@ -198,24 +196,45 @@ export default function HomePage() {
       </Card>
       {typeof state.value === "object" && "Game Over" in state.value && (
         <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
-          <div className="rounded bg-white p-6 text-center shadow-lg">
+          <div className="rounded-xl bg-white p-6 text-center shadow-lg">
             {state.value["Game Over"] === "Player Won" && (
-              <h2 className="mb-4 bg-green-300 font-semibold text-xl">
-                Winner: {state.context.winner}
+              <h2 className="mb-4 font-semibold text-xl">
+                Winner:{" "}
+                {state.context.winner === me.playerSide
+                  ? me.playerName
+                  : enemy?.playerName}
               </h2>
             )}
             {state.value["Game Over"] === "Draw" && (
-              <div className="mb-4 bg-yellow-500 font-semibold text-xl">
-                Draw
-              </div>
+              <div className="mb-4 font-semibold text-xl">Draw</div>
             )}
             <button
               type="submit"
-              className="mt-2 rounded bg-blue-500 px-4 py-2 text-white hover:bg-blue-700"
+              className="mt-2 rounded bg-[#82C829]/60 px-4 py-2 font-bold text-black hover:bg-[#82C829]/80"
               onClick={handleResetGame}
             >
-              Reset
+              Play again
             </button>
+          </div>
+        </div>
+      )}
+      {state.value === "Waiting For Players" && (
+        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
+          <div className="flex flex-col space-y-8 rounded-xl bg-white p-6 text-center shadow-lg">
+            <div className="select-none font-semibold text-xl">
+              Waiting for other player to join...
+            </div>
+            <div className="flex flex-col items-start justify-center">
+              <div className="flex w-full flex-row items-center justify-between">
+                <div className="select-none text-muted-foreground text-xl italic leading-none">
+                  Invite link:
+                </div>
+                <div className="flex items-center">
+                  <Button onClick={handleCopyGameId}>Copy</Button>
+                </div>
+              </div>
+              <div className="font-semibold text-xl">{gameId}</div>
+            </div>
           </div>
         </div>
       )}

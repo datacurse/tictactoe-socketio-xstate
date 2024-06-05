@@ -15,6 +15,7 @@ interface Player {
   playerSide: PlayerSide;
   playerName: string | undefined;
   secondsLeft: number;
+  wins: number;
 }
 
 interface TicTacToeContext {
@@ -26,11 +27,18 @@ interface TicTacToeContext {
   players: Player[];
   onlineUsers: string[];
   gameStartTime: Date | undefined;
-  lastMoveTime: Date | undefined; // Added field for the last move time
+  lastMoveTime: Date | undefined;
+}
+
+function randomlyAssignSides(players: Player[]): Player[] {
+  const shuffledPlayers = [...players].sort(() => Math.random() - 0.5);
+  shuffledPlayers[0].playerSide = "x";
+  shuffledPlayers[1].playerSide = "o";
+  return shuffledPlayers;
 }
 
 export const ticTacToeMachine =
-  /** @xstate-layout N4IgpgJg5mDOIC5QBUCWBjZBDTB7MABALI4AWqAdmAMQCusYATgHTq4VXoAuA2gAwBdRKAAOuWKi6p2wkAA9EAWgAsANgDszdQFY+e5QE4AzKoBMfbQA4ANCACeS08s06+lt6oNqAjJdMGAXwDbNEwcZHxiMkoaeiZmCFRYNg4wbn4hJBAxCSkZLIUERVN1b2YLK28jbXUDHXV1WwcipxddWoNvGst1Q20gkIxsPEISdHIqOgYWROT2Tl5vTNFxSWkKWULFIwNTZlVtTx0jHUtd5WUmpWU9ko0zo2VdDT51AZBQ4YjR6KpmAHUsGsKFACAAxXCMAgABQANlg7ExYNQAEZpXAAWzAzBE8MRjAyshya3yoC2TyMzFMuj4akMqncbm0VwQTkpej4VXUqlUFI0b2CHyG4UiYwm2MBwNBEKhcIRSNR6KxOLxTB4SyJqzyGwK10sqiphjO-mUfCMJ28LOqmgMtq82lM3lUtP870+Ip+4xiAKBUhB4MhMNVjGRhKyxO1myUvj4VJpB0eGk82iMLKdBnKTgMPWcOjqxjdwpGUS9fwAggB3X2UUFy-HEXAANxoGKbYDDK1y6yjRTUzBuzgZ2YMTIMqhZpj8zBp3j4BysJiMplUhbCxbF3sr1f9daYDeb1A72S13d1rJ20903idvP1Y4saYa-bt19qnO8Y-6gvd69+2K3UpBvKUJEG2h4auGJ6kvIiCOhmXScmafD+GahiXPYsGqGUZy2ihBiHEYqGrl8op-swADiWBYgQADyzaMNQuIIswWBQECFBHhGp5kog17KFolhOo8k7mLO44YUUlKGLalhqGcFjqHwtpBIKFC4BAcCyD+3wluKmpdtBWwpvxWbGl4ZoWiyijeP407crUvjXuYuzER6unepKfrSoGu4hvpJI6jxvbePxlhGCFDpnB+pqWhJN7MCc0kmOYzpdMorm-qW-5VoBvn7mA-mRmetk8q0hwNKYRg9N4jRxTyCW9LayVzpy2jpd+RY6RufyUdRdFMIV3EwQgdKZjSFzKCF6hOMyEl1P20n6gONm+CuHVrl1ZG9YQ-UsHl-zQVxhmINoNlaI16g7DZpRnGmslaDSFS1IcyhGBlm1ZRRVE7fRzAACKMFgFaDcdCCnXsyHjRcU1OFatLMLsuhjk6JpuCpARAA */
+  /** @xstate-layout N4IgpgJg5mDOIC5QBUCWBjZBDTB7MABALI4AWqAdmAMQCusYATgHTq4VXoAuA2gAwBdRKAAOuWKi6p2wkAA9EAWgAsANgDszdQFY+e5QE4AzKoBMfbQA4ANCACeS08s06+lt6oNqAjJdMGAXwDbNEwcZHxiMkoaeiZmCFRYNg4wbn4hJBAxCSkZLIUERVN1b2YLK28jbXUDHXV1WwcipxddWoNvGst1Q20gkIxsPEISdHIqOgYWROT2Tl5vTNFxSWkKWULFIwNTZlVtTx0jHUtd5WUmpWU9ko0zo2VdDT51AZBQ4YjR6KpmAHUsGsKFACAAxXCMAgABQANlg7ExYNQAEZpXAAWzAzBE8MRjAyshya3yoC2TyMzFMuj4akMqncbm0VwQTkpej4VXUqlUFI0b2CHyG4UiYwm2MBwNBEKhcIRSNR6KxOLxTB4SyJqzyGwK10sqiphjO-mUfCMJ28LOqmgMtq82lM3lUtP870+Ip+4xiAKBUhB4MhMNVjGRhKyxO1myUvj4VJpB0eGk82iMLKdBnKTgMPWcOjqxjdwpGUS9fwAggB3X2UUFy-HEXAANxoGKbYDDK1y6yjRTUzBuzgZ2YMTIMqhZpj8zBp3j4BysJiMplUhbCxbF3sr1f9daYDeb1A72S13d1rJ20903idvP1Y4saYa-bt19qnO8Y-6gvd69+2K3UpBvKUJEG2h4auGJ6kvIiCOhmXScmafD+GahiXPYsGqGUZy2ihBiHEYqGrl8op-swADiWBYgQADyzaMNQuIIswWBQECFBHhGp5kog17KFolhOo8k7mLO44YUUlKGLalhqGcFjqHwtpBIKFC4BAcCyD+3wluKmpdtBWwpvxWbGl4ZoWiyijeP407crUOgaNSJjER6unepKfrSoGu4hvpJI6jxvbePxlhGCFDpnB+pqWhJN7MCc0kmOYzpdMorm-qW-5VoBvn7mA-mRmetk8q0hwNKYRg9N4jRxTyCW9LayVzpy2jpd+RY6RufyUdRdFMIV3EwQgdKZjSFzKCF6hOMyEl1P20l1NaJwNJYGVdWRvWEP1LB5f80FcYZiDaDZWiNeoOw2aUZxprJWg0hUtSHMoRjraRWUUVR230cwAAijBYBWg1HQgJ17Mh40XFNThWrSzC7LoY5OiabgqQEQA */
   setup({
     types: {
       input: {} as {
@@ -72,12 +80,10 @@ export const ticTacToeMachine =
             (player) => player.playerName === undefined,
           );
           if (undefinedPlayers.length === 2) {
-            // Both playerIds are undefined, assign the playerId to a random player
             const randomIndex = Math.floor(Math.random() * 2);
-            updatedPlayers[randomIndex]!.playerName = event.playerName; // Assertion added
+            updatedPlayers[randomIndex]!.playerName = event.playerName;
           } else if (undefinedPlayers.length === 1) {
-            // Only one playerId is undefined, assign the playerId to that player
-            undefinedPlayers[0]!.playerName = event.playerName; // Assertion added
+            undefinedPlayers[0]!.playerName = event.playerName;
           }
           return updatedPlayers;
         },
@@ -94,7 +100,7 @@ export const ticTacToeMachine =
           context.movingPlayer === "x" ? "o" : "x",
         gameStartTime: ({ context }) =>
           context.moves + 1 === 2 ? new Date() : context.gameStartTime,
-        lastMoveTime: ({ context }) => new Date(), // Set the last move time to the current time
+        lastMoveTime: ({ context }) => new Date(),
         players: ({ context, event }) => {
           if (context.moves < 2) return context.players;
           assertEvent(event, "move");
@@ -120,15 +126,27 @@ export const ticTacToeMachine =
         moves: 0,
         movingPlayer: "x",
         winner: undefined,
-        lastMoveTime: undefined, // Reset last move time
+        lastMoveTime: undefined,
         players: ({ context }) =>
-          context.players.map((player) => ({
-            ...player,
-            secondsLeft: 300,
-          })), // Reset players' time without resetting players
+          randomlyAssignSides(
+            context.players.map((player) => ({
+              ...player,
+              secondsLeft: 300,
+            })),
+          ),
       }),
       setWinner: assign({
         winner: ({ context }) => (context.movingPlayer === "x" ? "o" : "x"),
+        players: ({ context }) => {
+          const winnerPlayer = context.players.find(
+            (player) =>
+              player.playerSide === (context.movingPlayer === "x" ? "o" : "x"),
+          );
+          if (winnerPlayer) {
+            winnerPlayer.wins += 1;
+          }
+          return context.players;
+        },
       }),
     },
 
@@ -192,9 +210,6 @@ export const ticTacToeMachine =
       "last user is leaving": ({ context }) => {
         return context.onlineUsers.length === 1;
       },
-      // "2 initial moves done": ({ context }) => {
-      //   return context.moves === 2;
-      // },
     },
   }).createMachine({
     id: "TicTacToe Machine",
@@ -211,16 +226,18 @@ export const ticTacToeMachine =
           playerSide: "x",
           playerName: undefined,
           secondsLeft: 300,
+          wins: 0,
         },
         {
           playerSide: "o",
           playerName: undefined,
           secondsLeft: 300,
+          wins: 0,
         },
       ],
       onlineUsers: [],
       gameStartTime: undefined,
-      lastMoveTime: undefined, // Initialize lastMoveTime as undefined
+      lastMoveTime: undefined,
     }),
 
     on: {

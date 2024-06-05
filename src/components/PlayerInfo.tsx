@@ -56,7 +56,7 @@ export const UserInfo: FC<UserInfoProps> = ({
         <div className="font-medium">Wins: {wins}</div>
       </div>
       <div
-        className={cn("h-fit bg-[#E0E0E0] p-2 font-medium text-4xl", {
+        className={cn("h-fit w-[104px] bg-[#E0E0E0] p-2 font-medium text-4xl", {
           "bg-[#82C829]/60": isMyTurn,
         })}
       >

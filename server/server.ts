@@ -4,8 +4,8 @@ import next from "next";
 import { customParser } from "server/customParser";
 import { Server as SocketIOServer } from "socket.io";
 import { type ActorRefFrom, createActor } from "xstate";
-import { gameCenterMachine } from "./gameCenterMachine";
-import type { ticTacToeMachine } from "./ticTacToeMachine";
+import { gameCenterMachine } from "./machines/gameCenterMachine";
+import type { ticTacToeMachine } from "./machines/ticTacToeMachine";
 const { inspect } = createSkyInspector();
 
 const gameCenterMachineActor = createActor(gameCenterMachine, { inspect });
