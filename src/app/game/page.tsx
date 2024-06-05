@@ -7,6 +7,7 @@ import { Card } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
 import { formatTime } from "@/lib/utils";
 import Timer from "easytimer.js";
+import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 
@@ -158,86 +159,98 @@ export default function HomePage() {
     state.context.onlineUsers.includes(playerName);
 
   return (
-    <div className="flex h-screen items-center justify-center">
-      <Card>
-        <div className="flex w-[352px] flex-col items-center">
-          {enemy && (
-            <UserInfo
-              username={enemy.playerName ?? ""}
-              wins={10}
-              playerSide={enemy.playerSide}
-              isMyTurn={state.context.movingPlayer === enemy.playerSide}
-              isConnected={isOnline(enemy ? enemy.playerName ?? "" : "")}
-              timeLeft={enemyTime}
-            />
-          )}
-          <div
-            className="grid h-full w-fit grid-cols-3 gap-4"
-            style={{ gridTemplateRows: "repeat(3, minmax(0, 1fr))" }}
-          >
-            {range(0, 9).map((index) => (
-              <Tile
-                index={index}
-                onClick={() => handlePlayMove(index)}
-                key={index}
-                player={state.context.board[index] ?? null}
+    <>
+      <div className="absolute left-0 z-10 mt-4 ml-4">
+        <Link
+          href={"/"}
+          className="flex h-fit flex-col items-start justify-between rounded-md border bg-white px-4 shadow transition-colors hover:cursor-pointer dark:bg-gray-950 dark:hover:bg-gray-800 hover:bg-gray-100"
+        >
+          <div className="flex size-12 items-center justify-center">
+            <div className="font-semibold text-2xl">Back</div>
+          </div>
+        </Link>
+      </div>
+      <div className="flex h-screen items-center justify-center">
+        <Card>
+          <div className="flex w-[352px] flex-col items-center">
+            {enemy && (
+              <UserInfo
+                username={enemy.playerName ?? ""}
+                wins={10}
+                playerSide={enemy.playerSide}
+                isMyTurn={state.context.movingPlayer === enemy.playerSide}
+                isConnected={isOnline(enemy ? enemy.playerName ?? "" : "")}
+                timeLeft={enemyTime}
               />
-            ))}
-          </div>
-          <UserInfo
-            username={me.playerName ?? ""}
-            wins={10}
-            playerSide={me.playerSide}
-            isMyTurn={state.context.movingPlayer === me.playerSide}
-            isConnected={isOnline(me.playerName || "")}
-            timeLeft={myTime}
-          />
-        </div>
-      </Card>
-      {typeof state.value === "object" && "Game Over" in state.value && (
-        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
-          <div className="rounded-xl bg-white p-6 text-center shadow-lg">
-            {state.value["Game Over"] === "Player Won" && (
-              <h2 className="mb-4 font-semibold text-xl">
-                Winner:{" "}
-                {state.context.winner === me.playerSide
-                  ? me.playerName
-                  : enemy?.playerName}
-              </h2>
             )}
-            {state.value["Game Over"] === "Draw" && (
-              <div className="mb-4 font-semibold text-xl">Draw</div>
-            )}
-            <button
-              type="submit"
-              className="mt-2 rounded bg-[#82C829]/60 px-4 py-2 font-bold text-black hover:bg-[#82C829]/80"
-              onClick={handleResetGame}
+            <div
+              className="grid h-full w-fit grid-cols-3 gap-4"
+              style={{ gridTemplateRows: "repeat(3, minmax(0, 1fr))" }}
             >
-              Play again
-            </button>
-          </div>
-        </div>
-      )}
-      {state.value === "Waiting For Players" && (
-        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
-          <div className="flex flex-col space-y-8 rounded-xl bg-white p-6 text-center shadow-lg">
-            <div className="select-none font-semibold text-xl">
-              Waiting for other player to join...
+              {range(0, 9).map((index) => (
+                <Tile
+                  index={index}
+                  onClick={() => handlePlayMove(index)}
+                  key={index}
+                  player={state.context.board[index] ?? null}
+                />
+              ))}
             </div>
-            <div className="flex flex-col items-start justify-center">
-              <div className="flex w-full flex-row items-center justify-between">
-                <div className="select-none text-muted-foreground text-xl italic leading-none">
-                  Invite link:
-                </div>
-                <div className="flex items-center">
-                  <Button onClick={handleCopyGameId}>Copy</Button>
-                </div>
+            <UserInfo
+              username={me.playerName ?? ""}
+              wins={10}
+              playerSide={me.playerSide}
+              isMyTurn={state.context.movingPlayer === me.playerSide}
+              isConnected={isOnline(me.playerName || "")}
+              timeLeft={myTime}
+            />
+          </div>
+        </Card>
+        {typeof state.value === "object" && "Game Over" in state.value && (
+          <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
+            <div className="rounded-xl bg-white p-6 text-center shadow-lg">
+              {state.value["Game Over"] === "Player Won" && (
+                <h2 className="mb-4 font-semibold text-xl">
+                  Winner:{" "}
+                  {state.context.winner === me.playerSide
+                    ? me.playerName
+                    : enemy?.playerName}
+                </h2>
+              )}
+              {state.value["Game Over"] === "Draw" && (
+                <div className="mb-4 font-semibold text-xl">Draw</div>
+              )}
+              <button
+                type="submit"
+                className="mt-2 rounded bg-[#82C829]/60 px-4 py-2 font-bold text-black hover:bg-[#82C829]/80"
+                onClick={handleResetGame}
+              >
+                Play again
+              </button>
+            </div>
+          </div>
+        )}
+        {state.value === "Waiting For Players" && (
+          <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
+            <div className="flex flex-col space-y-8 rounded-xl bg-white p-6 text-center shadow-lg">
+              <div className="select-none font-semibold text-xl">
+                Waiting for other player to join...
               </div>
-              <div className="font-semibold text-xl">{gameId}</div>
+              <div className="flex flex-col items-start justify-center">
+                <div className="flex w-full flex-row items-center justify-between">
+                  <div className="select-none text-muted-foreground text-xl italic leading-none">
+                    Invite link:
+                  </div>
+                  <div className="flex items-center">
+                    <Button onClick={handleCopyGameId}>Copy</Button>
+                  </div>
+                </div>
+                <div className="font-semibold text-xl">{gameId}</div>
+              </div>
             </div>
           </div>
-        </div>
-      )}
-    </div>
+        )}
+      </div>
+    </>
   );
 }

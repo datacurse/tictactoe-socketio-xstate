@@ -66,7 +66,6 @@ void app.prepare().then(() => {
 
     function broadcastState() {
       if (stateMachineActor) {
-        const persistedState = stateMachineActor.getPersistedSnapshot();
         io.to(socket.data.roomId).emit(
           "updateState",
           serializeState(stateMachineActor.getSnapshot()),

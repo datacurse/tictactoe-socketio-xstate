@@ -1,3 +1,9 @@
 to run this project type:
-`pnpm i`
-`pnpm run dev`
+
+```
+pnpm i
+```
+
+```
+pnpm run dev
+```
